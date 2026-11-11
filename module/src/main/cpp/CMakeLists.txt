@@ -52,6 +52,11 @@ add_library(${MODULE_NAME}
         hook.cpp
         )
 
+# Define your prebuilt libVXTeam.so library target
+add_library(VXTeam SHARED IMPORTED)
+set_target_properties(VXTeam PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_CURRENT_SOURCE_DIR}/libVXTeam.so)
+
 set(DOBBY_LIB ${CMAKE_CURRENT_SOURCE_DIR}/libs/${CMAKE_ANDROID_ARCH_ABI}/libdobby.a)
 set(CURL_LIB ${CMAKE_CURRENT_SOURCE_DIR}/libs/${CMAKE_ANDROID_ARCH_ABI}/libcurl.a)
 find_library(log-lib log)
@@ -73,12 +78,14 @@ endif (${ANDROID_PLATFORM_LEVEL} LESS 12)
 
 target_link_libraries(
         ${MODULE_NAME} log
+        VXTeam
         ${DOBBY_LIB}
         ${CURL_LIB}
         ${OPENGL_LIB}
         ${GLESV2_LIB}
         ${android}
         ${egl}  )
+
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} --strip-all --remove-section=.comment "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${MODULE_NAME}.so")
