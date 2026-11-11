@@ -1,0 +1,27 @@
+name: Build Zygisk Module
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v3
+        with:
+          ndk-version: r26b
+          add-to-path: true
+
+      - name: Configure CMake & Build
+        run: |
+          mkdir build && cd build
+          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=21 -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zygisk-ModMenu-Release
+          path: build/*.zip
